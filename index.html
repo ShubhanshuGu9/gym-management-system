@@ -6,121 +6,275 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gym Management System</title>
 <style>
+:root{--lime:#c8fa4b;--bg:#0d110f;--panel:#151b17;--line:#344036;--muted:#a2aca4}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0d110f;color:#f4f6ef}
-header{padding:22px 7%;background:#151b17;border-bottom:1px solid #344036}
-header h2{margin:0;color:#c8fa4b}
-main{max-width:950px;margin:35px auto;padding:20px}
-.hero{text-align:center;padding:25px 0}
-.hero h1{font-size:clamp(30px,5vw,48px)}
-.hero span{color:#c8fa4b}
-p{color:#a2aca4;line-height:1.6}
-.panel{background:#151b17;border:1px solid #344036;border-radius:14px;padding:22px;margin:18px 0}
+body{margin:0;background:var(--bg);color:#f4f6ef;font-family:Arial,sans-serif}
+header{padding:22px 6%;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+header h2{margin:0;color:var(--lime)}
+header span{color:var(--muted);font-size:13px}
+.hero{text-align:center;padding:48px 20px 25px}
+.hero small{color:var(--lime);letter-spacing:3px}
+.hero h1{font-size:clamp(32px,5vw,56px);margin:15px 0}
+.hero h1 span{color:var(--lime)}
+.hero p{color:var(--muted);line-height:1.7}
+main{max-width:1000px;margin:auto;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px}
 h2{margin-top:0}
-.options{display:flex;gap:10px;flex-wrap:wrap}
-button,select,input{font:inherit;border-radius:8px;padding:11px}
-button{cursor:pointer;background:#202920;color:white;border:1px solid #465346}
-button.selected,.primary{background:#c8fa4b;color:#11170a;border-color:#c8fa4b}
-.primary{font-weight:bold}
-.exercise{padding:15px;border-bottom:1px solid #344036}
-.exercise:last-child{border:0}
-.exercise strong{color:#c8fa4b}
-input{width:65px;background:#0d110f;color:white;border:1px solid #465346}
-footer{text-align:center;color:#a2aca4;padding:25px}
+.muted{color:var(--muted);line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+button,select{font:inherit;cursor:pointer}
+.choice{padding:16px;background:#1c241e;color:white;border:1px solid var(--line);border-radius:10px;text-align:left}
+.choice.selected{border-color:var(--lime);background:#27321d}
+.choice strong,.choice small{display:block}
+.choice small{color:var(--muted);margin-top:7px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{padding:12px 17px;border:1px solid var(--line);border-radius:9px;background:#202920;color:white}
+.btn.primary{background:var(--lime);color:#11170a;border-color:var(--lime);font-weight:bold}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{padding:10px 14px;background:#202920;border:1px solid var(--line);color:white;border-radius:25px}
+.chip.selected{background:var(--lime);color:#11170a}
+.hidden{display:none!important}
+.exercise{padding:17px;border:1px solid var(--line);border-radius:12px;margin-top:12px;background:#1a211b}
+.exercise h3{margin:0 0 8px}
+.exercise p{color:var(--muted);line-height:1.6}
+.exercise a{display:inline-block;margin-top:8px;color:var(--lime);font-weight:bold}
+.exercise input{width:60px;padding:7px;background:#0d110f;color:white;border:1px solid var(--line);border-radius:6px}
+.tutorial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.tutorial{padding:15px;background:#202920;border:1px solid var(--line);border-radius:10px}
+.tutorial a{color:var(--lime);font-weight:bold}
+footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
+@media(max-width:500px){header{padding:18px}main{padding:12px}.card{padding:17px}}
 </style>
 </head>
 <body>
-<header><h2>GYM MANAGEMENT SYSTEM</h2></header>
-<main>
+<header>
+  <h2>💪 Gym Management System</h2>
+  <span>YOUR TRAINING. YOUR RULES.</span>
+</header>
+
 <section class="hero">
-<p>YOUR TRAINING. YOUR RULES.</p>
-<h1>Build your <span>next workout.</span></h1>
-<p>Select your equipment and target muscles to create a personalised workout plan.</p>
+  <small>WORKOUT BUILDER</small>
+  <h1>Build your <span>next workout.</span></h1>
+  <p>Select your equipment and target muscles to generate a workout plan.<br>
+  Watch exercise tutorials to learn the movements.</p>
 </section>
 
-<section class="panel">
-<h2>1. Choose your equipment</h2>
-<div class="options" id="equipment">
-<button class="selected">Bodyweight</button>
-<button>Dumbbells</button>
-<button>Barbell</button>
-<button>Resistance Bands</button>
-<button>Kettlebell</button>
-<button>Bench</button>
-</div>
+<main>
+<section class="card" id="equipmentSection">
+  <h2>1. Choose your equipment</h2>
+  <p class="muted">Select all the equipment you can use.</p>
+  <div class="grid" id="equipmentGrid"></div>
+  <div class="actions">
+    <button class="btn primary" id="nextButton">Choose muscles →</button>
+  </div>
 </section>
 
-<section class="panel">
-<h2>2. Choose muscle groups</h2>
-<div class="options" id="muscles">
-<button class="selected">Chest</button>
-<button class="selected">Back</button>
-<button>Shoulders</button>
-<button>Biceps</button>
-<button>Triceps</button>
-<button>Abs</button>
-<button>Legs</button>
-</div>
-<br>
-<button class="primary" id="generate">Generate Workout ↗</button>
+<section class="card hidden" id="muscleSection">
+  <h2>2. Choose muscle groups</h2>
+  <p class="muted">Select the muscles you want to train today.</p>
+  <div class="chips" id="muscleGrid"></div>
+  <div class="actions">
+    <button class="btn" id="backButton">← Back</button>
+    <button class="btn primary" id="generateButton">Generate workout</button>
+  </div>
 </section>
 
-<section class="panel">
-<h2>3. Your workout plan</h2>
-<div id="result"><p>Select your options and generate a workout.</p></div>
-<button onclick="window.print()">Print / Save PDF</button>
-<button onclick="copyPlan()">Copy Workout</button>
+<section class="card hidden" id="workoutSection">
+  <h2>3. Your workout plan</h2>
+  <p class="muted">Adjust the sets and open a tutorial for each exercise.</p>
+  <div id="workoutList"></div>
+  <div class="actions">
+    <button class="btn" id="editButton">← Edit choices</button>
+    <button class="btn primary" id="regenerateButton">Regenerate workout</button>
+    <button class="btn" id="printButton">Print / Save PDF</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>🎥 Exercise video tutorials</h2>
+  <p class="muted">Choose an exercise to find demonstrations of proper technique on YouTube.</p>
+  <div class="tutorial-grid" id="tutorialGrid"></div>
+</section>
+
+<section class="card">
+  <h2>How to do your workout safely</h2>
+  <ol class="muted" style="line-height:2">
+    <li>Warm up for 5–10 minutes before exercising.</li>
+    <li>Start with a light weight and learn the correct technique.</li>
+    <li>Use controlled movements instead of swinging weights.</li>
+    <li>Try 2–3 sets per exercise and rest 60–120 seconds between sets.</li>
+    <li>Breathe continuously; do not hold your breath during repetitions.</li>
+    <li>Stop if you feel sharp pain. Ask a qualified trainer for help with your form.</li>
+  </ol>
 </section>
 </main>
-<footer>Gym Management System · Train with good form</footer>
+
+<footer>GYM MANAGEMENT SYSTEM · PLAN YOUR TRAINING · TRAIN WITH GOOD FORM</footer>
 
 <script>
-document.querySelectorAll('.options button').forEach(button=>{
- button.addEventListener('click',()=>button.classList.toggle('selected'));
-});
+const equipment=[
+ {id:"body",name:"Bodyweight",desc:"No equipment needed",icon:"🏃"},
+ {id:"dumbbell",name:"Dumbbells",desc:"Free weights",icon:"🏋️"},
+ {id:"barbell",name:"Barbell",desc:"Bar and plates",icon:"⚒️"},
+ {id:"band",name:"Resistance band",desc:"Bands and tubes",icon:"〰️"},
+ {id:"bench",name:"Bench",desc:"Flat or incline",icon:"▰"},
+ {id:"pullup",name:"Pull-up bar",desc:"Pulling exercises",icon:"↟"},
+ {id:"kettlebell",name:"Kettlebell",desc:"Single or pair",icon:"🔔"}
+];
 
-const workouts={
- Chest:[['Push-ups','Bodyweight'],['Dumbbell Press','Dumbbells'],['Barbell Bench Press','Barbell']],
- Back:[['Pull-ups','Bodyweight'],['Dumbbell Row','Dumbbells'],['Barbell Row','Barbell']],
- Shoulders:[['Pike Push-ups','Bodyweight'],['Shoulder Press','Dumbbells']],
- Biceps:[['Biceps Curl','Dumbbells'],['Barbell Curl','Barbell']],
- Triceps:[['Close-grip Push-ups','Bodyweight'],['Triceps Extension','Dumbbells']],
- Abs:[['Plank','Bodyweight'],['Bicycle Crunch','Bodyweight']],
- Legs:[['Squats','Bodyweight'],['Goblet Squats','Kettlebell']]
-};
+const muscles=["Chest","Back","Shoulders","Biceps","Triceps","Abs","Quadriceps","Hamstrings","Glutes","Calves"];
 
-function generate(){
- const equipment=[...document.querySelectorAll('#equipment .selected')].map(b=>b.textContent);
- const muscles=[...document.querySelectorAll('#muscles .selected')].map(b=>b.textContent);
- let list=[];
- muscles.forEach(m=>{
-  (workouts[m]||[]).forEach(ex=>{
-   if(equipment.includes(ex[1])&&!list.some(x=>x[0]===ex[0]))list.push(ex);
-  });
+const exercises=[
+ {name:"Push-ups",muscles:["Chest","Triceps","Shoulders"],gear:["body"],reps:"8–15"},
+ {name:"Dumbbell Floor Press",muscles:["Chest","Triceps"],gear:["dumbbell"],reps:"8–12"},
+ {name:"Dumbbell Fly",muscles:["Chest"],gear:["dumbbell","bench"],reps:"10–12"},
+ {name:"Pull-ups",muscles:["Back","Biceps"],gear:["pullup"],reps:"5–10"},
+ {name:"Dumbbell Row",muscles:["Back","Biceps"],gear:["dumbbell"],reps:"8–12"},
+ {name:"Resistance Band Row",muscles:["Back","Biceps"],gear:["band"],reps:"12–15"},
+ {name:"Dumbbell Shoulder Press",muscles:["Shoulders","Triceps"],gear:["dumbbell"],reps:"8–12"},
+ {name:"Pike Push-ups",muscles:["Shoulders","Triceps"],gear:["body"],reps:"6–12"},
+ {name:"Dumbbell Lateral Raise",muscles:["Shoulders"],gear:["dumbbell"],reps:"12–15"},
+ {name:"Dumbbell Biceps Curl",muscles:["Biceps"],gear:["dumbbell"],reps:"10–12"},
+ {name:"Barbell Curl",muscles:["Biceps"],gear:["barbell"],reps:"8–12"},
+ {name:"Hammer Curl",muscles:["Biceps"],gear:["dumbbell"],reps:"10–12"},
+ {name:"Bench Dips",muscles:["Triceps"],gear:["bench","body"],reps:"8–12"},
+ {name:"Overhead Dumbbell Extension",muscles:["Triceps"],gear:["dumbbell"],reps:"10–12"},
+ {name:"Plank",muscles:["Abs"],gear:["body"],reps:"30–60 seconds"},
+ {name:"Bicycle Crunch",muscles:["Abs"],gear:["body"],reps:"16–24"},
+ {name:"Goblet Squat",muscles:["Quadriceps","Glutes"],gear:["dumbbell","kettlebell"],reps:"8–12"},
+ {name:"Bodyweight Squat",muscles:["Quadriceps","Glutes"],gear:["body"],reps:"12–20"},
+ {name:"Dumbbell Split Squat",muscles:["Quadriceps","Glutes"],gear:["dumbbell","body"],reps:"8–12 each leg"},
+ {name:"Romanian Deadlift",muscles:["Hamstrings","Glutes","Back"],gear:["barbell","dumbbell"],reps:"8–12"},
+ {name:"Glute Bridge",muscles:["Glutes","Hamstrings"],gear:["body"],reps:"12–20"},
+ {name:"Hip Thrust",muscles:["Glutes","Hamstrings"],gear:["bench","barbell"],reps:"8–12"},
+ {name:"Standing Calf Raise",muscles:["Calves"],gear:["body","dumbbell"],reps:"12–20"}
+];
+
+const selectedEquipment=new Set(["body"]);
+const selectedMuscles=new Set(["Chest","Back"]);
+let currentWorkout=[];
+
+function renderEquipment(){
+ const grid=document.getElementById("equipmentGrid");
+ grid.innerHTML="";
+ equipment.forEach(item=>{
+  const button=document.createElement("button");
+  button.className="choice"+(selectedEquipment.has(item.id)?" selected":"");
+  button.innerHTML=`<strong>${item.icon} ${item.name}</strong><small>${item.desc}</small>`;
+  button.onclick=()=>{
+   if(selectedEquipment.has(item.id)){
+    if(selectedEquipment.size===1)return;
+    selectedEquipment.delete(item.id);
+   }else selectedEquipment.add(item.id);
+   renderEquipment();
+  };
+  grid.appendChild(button);
  });
- const result=document.getElementById('result');
- if(!list.length){
-  result.innerHTML='<p>No matching exercises. Select more equipment or muscle groups.</p>';
+}
+
+function renderMuscles(){
+ const grid=document.getElementById("muscleGrid");
+ grid.innerHTML="";
+ muscles.forEach(muscle=>{
+  const button=document.createElement("button");
+  button.className="chip"+(selectedMuscles.has(muscle)?" selected":"");
+  button.textContent=muscle;
+  button.onclick=()=>{
+   if(selectedMuscles.has(muscle))selectedMuscles.delete(muscle);
+   else selectedMuscles.add(muscle);
+   renderMuscles();
+  };
+  grid.appendChild(button);
+ });
+}
+
+function showSection(id){
+ ["equipmentSection","muscleSection","workoutSection"].forEach(section=>{
+  document.getElementById(section).classList.toggle("hidden",section!==id);
+ });
+}
+
+function videoUrl(name){
+ return "https://www.youtube.com/results?search_query="+encodeURIComponent(name+" exercise proper form tutorial");
+}
+
+function generateWorkout(){
+ if(selectedMuscles.size===0){
+  alert("Please select at least one muscle group.");
   return;
  }
- result.innerHTML=list.map((ex,i)=>`
- <div class="exercise">
- <strong>${i+1}. ${ex[0]}</strong>
- <p>${ex[1]} · 3 sets · 10–12 reps</p>
- <label>Sets: <input type="number" min="1" max="8" value="3"></label>
- </div>`).join('');
+ const matching=exercises.filter(ex=>
+  ex.gear.some(g=>selectedEquipment.has(g))&&
+  ex.muscles.some(m=>selectedMuscles.has(m))
+ );
+ currentWorkout=[];
+ const pool=[...matching].sort(()=>Math.random()-.5);
+ const usedMuscles=new Set();
+ for(const ex of pool){
+  if(currentWorkout.length>=10)break;
+  if(ex.muscles.some(m=>selectedMuscles.has(m)&&!usedMuscles.has(m))){
+   currentWorkout.push(ex);
+   ex.muscles.forEach(m=>{if(selectedMuscles.has(m))usedMuscles.add(m);});
+  }
+ }
+ for(const ex of pool){
+  if(currentWorkout.length>=Math.min(10,pool.length))break;
+  if(!currentWorkout.includes(ex))currentWorkout.push(ex);
+ }
+ renderWorkout();
+ showSection("workoutSection");
 }
 
-document.getElementById('generate').addEventListener('click',generate);
-
-function copyPlan(){
- const text=document.getElementById('result').innerText;
- if(navigator.clipboard&&navigator.clipboard.writeText){
-  navigator.clipboard.writeText(text)
-   .then(()=>alert('Workout copied!'))
-   .catch(()=>prompt('Copy your workout:',text));
- }else prompt('Copy your workout:',text);
+function renderWorkout(){
+ const list=document.getElementById("workoutList");
+ list.innerHTML="";
+ if(currentWorkout.length===0){
+  list.innerHTML='<p class="muted">No matching exercises found. Go back and select more equipment.</p>';
+  return;
+ }
+ currentWorkout.forEach((ex,index)=>{
+  const item=document.createElement("article");
+  item.className="exercise";
+  item.innerHTML=`
+   <h3>${index+1}. ${ex.name}</h3>
+   <p>Target muscles: ${ex.muscles.join(", ")}<br>Recommended repetitions: ${ex.reps}</p>
+   <label>Sets:
+    <input type="number" min="1" max="8" value="3" aria-label="Sets for ${ex.name}">
+   </label>
+   <p><a href="${videoUrl(ex.name)}" target="_blank" rel="noopener noreferrer">▶ Watch how to do ${ex.name}</a></p>
+   <button class="btn removeButton">Remove exercise</button>`;
+  item.querySelector(".removeButton").onclick=()=>{
+   currentWorkout.splice(index,1);
+   renderWorkout();
+  };
+  list.appendChild(item);
+ });
 }
+
+document.getElementById("nextButton").onclick=()=>{
+ renderMuscles();
+ showSection("muscleSection");
+};
+document.getElementById("backButton").onclick=()=>showSection("equipmentSection");
+document.getElementById("editButton").onclick=()=>showSection("muscleSection");
+document.getElementById("generateButton").onclick=generateWorkout;
+document.getElementById("regenerateButton").onclick=generateWorkout;
+document.getElementById("printButton").onclick=()=>window.print();
+
+const tutorials=[
+ "Push-ups","Squats","Dumbbell Bench Press","Pull-ups",
+ "Dumbbell Row","Shoulder Press","Biceps Curl","Plank",
+ "Romanian Deadlift","Glute Bridge","Calf Raise","Lateral Raise"
+];
+document.getElementById("tutorialGrid").innerHTML=tutorials.map(name=>`
+ <div class="tutorial">
+  <strong>${name}</strong><br><br>
+  <a href="${videoUrl(name)}" target="_blank" rel="noopener noreferrer">▶ Watch tutorial on YouTube ↗</a>
+ </div>
+`).join("");
+
+renderEquipment();
+renderMuscles();
 </script>
 </body>
 </html>

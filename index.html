@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Management System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0d110f;color:#f4f6ef}
+header{padding:22px 7%;background:#151b17;border-bottom:1px solid #344036}
+header h2{margin:0;color:#c8fa4b}
+main{max-width:950px;margin:35px auto;padding:20px}
+.hero{text-align:center;padding:25px 0}
+.hero h1{font-size:clamp(30px,5vw,48px)}
+.hero span{color:#c8fa4b}
+p{color:#a2aca4;line-height:1.6}
+.panel{background:#151b17;border:1px solid #344036;border-radius:14px;padding:22px;margin:18px 0}
+h2{margin-top:0}
+.options{display:flex;gap:10px;flex-wrap:wrap}
+button,select,input{font:inherit;border-radius:8px;padding:11px}
+button{cursor:pointer;background:#202920;color:white;border:1px solid #465346}
+button.selected,.primary{background:#c8fa4b;color:#11170a;border-color:#c8fa4b}
+.primary{font-weight:bold}
+.exercise{padding:15px;border-bottom:1px solid #344036}
+.exercise:last-child{border:0}
+.exercise strong{color:#c8fa4b}
+input{width:65px;background:#0d110f;color:white;border:1px solid #465346}
+footer{text-align:center;color:#a2aca4;padding:25px}
+</style>
+</head>
+<body>
+<header><h2>GYM MANAGEMENT SYSTEM</h2></header>
+<main>
+<section class="hero">
+<p>YOUR TRAINING. YOUR RULES.</p>
+<h1>Build your <span>next workout.</span></h1>
+<p>Select your equipment and target muscles to create a personalised workout plan.</p>
+</section>
+
+<section class="panel">
+<h2>1. Choose your equipment</h2>
+<div class="options" id="equipment">
+<button class="selected">Bodyweight</button>
+<button>Dumbbells</button>
+<button>Barbell</button>
+<button>Resistance Bands</button>
+<button>Kettlebell</button>
+<button>Bench</button>
+</div>
+</section>
+
+<section class="panel">
+<h2>2. Choose muscle groups</h2>
+<div class="options" id="muscles">
+<button class="selected">Chest</button>
+<button class="selected">Back</button>
+<button>Shoulders</button>
+<button>Biceps</button>
+<button>Triceps</button>
+<button>Abs</button>
+<button>Legs</button>
+</div>
+<br>
+<button class="primary" id="generate">Generate Workout ↗</button>
+</section>
+
+<section class="panel">
+<h2>3. Your workout plan</h2>
+<div id="result"><p>Select your options and generate a workout.</p></div>
+<button onclick="window.print()">Print / Save PDF</button>
+<button onclick="copyPlan()">Copy Workout</button>
+</section>
+</main>
+<footer>Gym Management System · Train with good form</footer>
+
+<script>
+document.querySelectorAll('.options button').forEach(button=>{
+ button.addEventListener('click',()=>button.classList.toggle('selected'));
+});
+
+const workouts={
+ Chest:[['Push-ups','Bodyweight'],['Dumbbell Press','Dumbbells'],['Barbell Bench Press','Barbell']],
+ Back:[['Pull-ups','Bodyweight'],['Dumbbell Row','Dumbbells'],['Barbell Row','Barbell']],
+ Shoulders:[['Pike Push-ups','Bodyweight'],['Shoulder Press','Dumbbells']],
+ Biceps:[['Biceps Curl','Dumbbells'],['Barbell Curl','Barbell']],
+ Triceps:[['Close-grip Push-ups','Bodyweight'],['Triceps Extension','Dumbbells']],
+ Abs:[['Plank','Bodyweight'],['Bicycle Crunch','Bodyweight']],
+ Legs:[['Squats','Bodyweight'],['Goblet Squats','Kettlebell']]
+};
+
+function generate(){
+ const equipment=[...document.querySelectorAll('#equipment .selected')].map(b=>b.textContent);
+ const muscles=[...document.querySelectorAll('#muscles .selected')].map(b=>b.textContent);
+ let list=[];
+ muscles.forEach(m=>{
+  (workouts[m]||[]).forEach(ex=>{
+   if(equipment.includes(ex[1])&&!list.some(x=>x[0]===ex[0]))list.push(ex);
+  });
+ });
+ const result=document.getElementById('result');
+ if(!list.length){
+  result.innerHTML='<p>No matching exercises. Select more equipment or muscle groups.</p>';
+  return;
+ }
+ result.innerHTML=list.map((ex,i)=>`
+ <div class="exercise">
+ <strong>${i+1}. ${ex[0]}</strong>
+ <p>${ex[1]} · 3 sets · 10–12 reps</p>
+ <label>Sets: <input type="number" min="1" max="8" value="3"></label>
+ </div>`).join('');
+}
+
+document.getElementById('generate').addEventListener('click',generate);
+
+function copyPlan(){
+ const text=document.getElementById('result').innerText;
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(text)
+   .then(()=>alert('Workout copied!'))
+   .catch(()=>prompt('Copy your workout:',text));
+ }else prompt('Copy your workout:',text);
+}
+</script>
+</body>
+</html>
